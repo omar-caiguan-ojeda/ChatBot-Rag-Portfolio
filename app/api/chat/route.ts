@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { streamText, UIMessage, convertToModelMessages } from 'ai';
 import { getCVRAGContext } from '@/lib/cv-embeddings';
 
