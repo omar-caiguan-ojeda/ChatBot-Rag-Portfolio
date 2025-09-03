@@ -1,9 +1,48 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { streamText, UIMessage, convertToModelMessages } from 'ai';
 import { getCVRAGContext } from '@/lib/cv-embeddings';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
+
+// Type guard to check for text/content properties in message parts
+function isPartWithText(part: unknown): part is { text: string } | { content: string } {
+  return (
+    typeof part === 'object' &&
+    part !== null &&
+    ('text' in part || 'content' in part)
+  );
+}
+
+function extractTextFromMessage(message: UIMessage): string {
+  const content = (message as { content?: unknown }).content;
+  const parts = (message as { parts?: unknown }).parts;
+
+  const extractFromParts = (items: unknown[]): string => {
+    return items
+      .map(part => {
+        if (typeof part === 'string') return part;
+        if (isPartWithText(part)) {
+          return (part as { text?: string }).text || (part as { content?: string }).content || '';
+        }
+        return '';
+      })
+      .join(' ');
+  };
+
+  if (Array.isArray(parts)) {
+    return extractFromParts(parts);
+  }
+
+  if (typeof content === 'string') {
+    return content;
+  }
+
+  if (Array.isArray(content)) {
+    return extractFromParts(content);
+  }
+
+  return '';
+}
 
 export async function POST(req: Request) {
   const {
@@ -28,106 +67,12 @@ export async function POST(req: Request) {
 
   // Si RAG está habilitado y no es búsqueda web, obtener contexto del CV
   if (useRAG && !webSearch && lastMessage?.role === 'user') {
-    const messageContent = lastMessage.parts
-        ? lastMessage.parts.map((part: any) => part.text).join(' ')
-        : '';
+    const messageContent = extractTextFromMessage(lastMessage);
     console.log('🔍 RAG activado, procesando mensaje:', messageContent);
 
     //console.log('🔍 RAG activado, procesando mensaje:', lastMessage.content);
     try {
       // Extract text content from UIMessage - handle multiple formats
-      let messageContent = '';
-      
-      // Check for parts array format (AI SDK v5)
-      if ((lastMessage as any).parts && Array.isArray((lastMessage as any).parts)) {
-        messageContent = (lastMessage as any).parts
-          .filter((part: any) => part.type === 'text')
-          .map((part: any) => part.text)
-          .join(' ');
-      }
-      // Try different ways to extract content
-      // else if (typeof lastMessage.content === 'string') {
-      //   messageContent = lastMessage.content;
-      // } else if (Array.isArray(lastMessage.content)) {
-      //   messageContent = lastMessage.content
-      //     .map(part => {
-      //       if (typeof part === 'string') return part;
-      //       if (typeof part === 'object' && part !== null) {
-      //         return (part as any).text || (part as any).content || '';
-      //       }
-      //       return '';
-      //     })
-      //     .filter(Boolean)
-      //     .join(' ');
-
-      // } else if (lastMessage.content && typeof lastMessage.content === 'object') {
-      //   // Handle object format
-      //   messageContent = (lastMessage.content as any).text || (lastMessage.content as any).content || '';
-      // }
-
-      // else if (typeof ((lastMessage as any).content)) {
-      //   messageContent = (lastMessage as any).content;
-      // } else if (Array.isArray((lastMessage as any).content)) {
-      //   messageContent = (lastMessage as any).content
-      //     .map(part => {
-      //       if (typeof part === 'string') return part;
-      //       if (typeof part === 'object' && part !== null) {
-      //         return (part as any).text || (part as any).content || '';
-      //       }
-      //       return '';
-      //     })
-      //     .filter(Boolean)
-      //     .join(' ');
-
-      else if (Array.isArray((lastMessage as any).content)) {
-        messageContent = (lastMessage as any).content
-          .map((part: any) => {
-            if (typeof part === 'string') return part;
-            if (typeof part === 'object' && part !== null) {
-              return (part as any).text || (part as any).content || '';
-            }
-            return '';
-          })
-          .filter(Boolean)
-          .join(' ');
-
-      } else if ((lastMessage as any).content && typeof (lastMessage as any).content === 'object') {
-        // Handle object format
-        messageContent = (lastMessage as any).content.text || (lastMessage as any).content.content || '';
-      }
-      
-      // Fallback: try to get text from other message properties
-      if (!messageContent && (lastMessage as any).text) {
-        messageContent = (lastMessage as any).text;
-      }
-      
-      // // Last resort: stringify and extract if it's a complex object
-      // if (!messageContent && lastMessage.content) {
-      //   try {
-      //     const contentStr = JSON.stringify(lastMessage.content);
-      //     if (contentStr && contentStr !== '{}' && contentStr !== 'null') {
-      //       messageContent = contentStr;
-      //     }
-      //   } catch (e) {
-      //     // Ignore JSON errors
-      //   }
-      // }
-      if (!messageContent && (lastMessage as any).text) {
-        messageContent = (lastMessage as any).text;
-      }
-
-      // Last resort: convertir a string si es un objeto complejo
-      if (!messageContent && (lastMessage as any).content) {
-        try {
-          const contentStr = JSON.stringify((lastMessage as any).content);
-          if (contentStr && contentStr !== '{}' && contentStr !== 'null') {
-            messageContent = contentStr;
-          }
-        } catch (e) {
-          // Ignorar errores de JSON
-        }
-      }
-      
       console.log('📝 Contenido extraído:', messageContent);
       
       if (messageContent && messageContent.trim()) {

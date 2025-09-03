@@ -11,7 +11,7 @@ interface CVDataRecord {
   section: string;
   title: string;
   content: string;
-  embedding: string | null;
+  embedding: number[] | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -111,8 +111,7 @@ async function manualSearchCVData(
       }
       
       try {
-        const embedding = JSON.parse(record.embedding)
-        const similarity = cosineSimilarity(queryEmbedding, embedding)
+        const similarity = cosineSimilarity(queryEmbedding, record.embedding)
         
         console.log(`📊 ${record.title}: similaridad = ${similarity.toFixed(3)}`);
         
@@ -121,7 +120,7 @@ async function manualSearchCVData(
           similarity
         }
       } catch (e) {
-        console.error('❌ Error parseando embedding para:', record.title, e);
+        console.error('❌ Error calculando similaridad para:', record.title, e);
         return null;
       }
     })
@@ -147,7 +146,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 // Función para obtener contexto RAG del CV
-export async function getCVRAGContext(query: string, maxTokens: number = 4000): Promise<string> {
+export async function getCVRAGContext(query: string): Promise<string> {
   let searchResult;
 
   // Lógica de búsqueda híbrida
@@ -163,7 +162,7 @@ export async function getCVRAGContext(query: string, maxTokens: number = 4000): 
     return '';
   }
 
-  const formattedResults = searchResult.results.map((result: any, index: number) => {
+  const formattedResults = searchResult.results.map((result: SearchResult, index: number) => {
     return `Fuente de Información ${index + 1}:\n- Sección: ${result.section}\n- Título: ${result.title}\n- Contenido: ${result.content}`;
   });
 
@@ -219,7 +218,7 @@ export async function addCVData(
         section,
         title,
         content,
-        embedding: embedding as any
+        embedding
       })
       .select()
       .single()
