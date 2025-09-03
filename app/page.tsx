@@ -37,10 +37,10 @@ import {
 import { Loader } from '@/components/loader';
 
 const models = [
-  {
-    name: 'GPT 4o',
-    value: 'openai/gpt-4o',
-  },
+  // {
+  //   name: 'GPT 4o',
+  //   value: 'openai/gpt-4o',
+  // },
   {
     name: 'GPT 4o Mini',
     value: 'openai/gpt-4o-mini',
