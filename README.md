@@ -1,106 +1,196 @@
-# Chatbot RAG con Next.js, OpenAI y Supabase
+# Omar Caiguan - Chatbot RAG Portfolio
 
-Este proyecto es un chatbot inteligente construido con Next.js que utiliza un modelo RAG (Retrieval-Augmented Generation) para responder preguntas sobre un currículum (CV). El chatbot aprovecha los embeddings de OpenAI para realizar búsquedas semánticas en una base de datos vectorial de Supabase (PostgreSQL con pgvector).
+Este proyecto es un chatbot inteligente construido con Next.js que utiliza un modelo RAG (Retrieval-Augmented Generation) para responder preguntas sobre mi experiencia profesional. El chatbot aprovecha los embeddings de OpenAI para realizar búsquedas semánticas en una base de datos vectorial de Supabase.
 
-## Características Principales
+## ✨ Características Destacadas
 
-- **Arquitectura RAG:** Enriquece las respuestas del modelo de lenguaje con información relevante extraída de una base de datos de conocimiento (el CV).
-- **Búsqueda Semántica:** Utiliza embeddings de texto (`text-embedding-3-small` de OpenAI) para encontrar la información más relevante a la pregunta del usuario, en lugar de depender de palabras clave.
-- **Base de Datos Vectorial:** Almacena los embeddings en Supabase y utiliza la extensión `pgvector` para realizar búsquedas de similitud de coseno de manera eficiente.
-- **API Propia:** Expone un endpoint (`/api/chat`) que puede ser consumido por cualquier frontend, como un portafolio personal.
-- **Interfaz de Chat:** Incluye una interfaz de usuario simple para probar el chatbot directamente.
+- **🎨 Interfaz Moderna:** Pantalla de bienvenida profesional con efectos de partículas animadas
+- **📱 Responsive Design:** Adaptable a diferentes dispositivos con diseño moderno
+- **🤖 Arquitectura RAG:** Respuestas enriquecidas con información relevante de mi CV
+- **🔍 Búsqueda Semántica:** Embeddings de OpenAI para encontrar información precisa
+- **⚡ Rendimiento Optimizado:** Canvas HTML5 para animaciones fluidas a 60 FPS
 
-## Tech Stack
+## 🎯 Interfaz de Usuario
 
-- **Framework:** [Next.js](https://nextjs.org/) (React)
+### Pantalla de Bienvenida
+- **Header personalizado** con nombre y título profesional
+- **Partículas animadas** con efectos de glow y trails
+- **Cards interactivas** con preguntas rápidas sobre:
+  - Habilidades técnicas
+  - Proyectos destacados
+  - Experiencia RAG
+  - Trayectoria profesional
+
+### Paleta de Colores
+```css
+Primary:   #2563eb  (Azul profesional)
+Accent:    #3b82f6  (Azul claro)
+Secondary: #64748b  (Gris azulado)
+Dark BG:   #0f172a → #1e293b (gradiente)
+Text:      #f1f5f9  (Texto claro)
+```
+
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js](https://nextjs.org/) (React 18)
 - **Lenguaje:** [TypeScript](https://www.typescriptlang.org/)
 - **IA y Embeddings:** [OpenAI API](https://openai.com/)
-- **Base de Datos:** [Supabase](https://supabase.com/) (PostgreSQL con extensión `pgvector`)
-- **Despliegue:** [Vercel](https://vercel.com/)
+- **Base de Datos:** [Supabase](https://supabase.com/) (PostgreSQL con pgvector)
+- **Estilos:** [Tailwind CSS](https://tailwindcss.com/)
+- **Iconos:** [Lucide React](https://lucide.dev/)
+- **Animaciones:** Canvas API HTML5
 
----
-
-## Configuración y Puesta en Marcha
-
-Sigue estos pasos para configurar y ejecutar el proyecto en un entorno de desarrollo local.
+## 🚀 Instalación y Configuración
 
 ### 1. Prerrequisitos
 
 - [Node.js](https://nodejs.org/) (versión 18 o superior)
-- Una cuenta de [OpenAI](https://platform.openai.com/) con una clave de API.
-- Una cuenta de [Supabase](https://supabase.com/) con un proyecto creado.
+- Cuenta de [OpenAI](https://platform.openai.com/) con API key
+- Cuenta de [Supabase](https://supabase.com/) con proyecto creado
 
-### 2. Clonar el Repositorio
+### 2. Clonar e Instalar
 
 ```bash
 git clone <URL-del-repositorio>
-cd <nombre-del-directorio>
-```
-
-### 3. Instalar Dependencias
-
-```bash
+cd ChatBot-Rag-Portfolio
 npm install
 ```
 
-### 4. Configurar la Base de Datos en Supabase
+### 3. Configurar Base de Datos
 
-1.  Ve a tu proyecto de Supabase y abre el **SQL Editor**.
-2.  Ejecuta el contenido del archivo `scripts/setup-cv-search.sql`. Esto creará la tabla `cv_data` y la función `search_cv_data` necesaria para la búsqueda semántica.
+1. Ve a tu proyecto de Supabase
+2. Abre el **SQL Editor**
+3. Ejecuta el contenido de `scripts/setup-cv-search.sql`
 
-### 5. Configurar las Variables de Entorno
+### 4. Variables de Entorno
 
-Crea un archivo llamado `.env.local` en la raíz del proyecto y añade las siguientes variables con tus propias claves:
+Crea `.env.local` con:
 
 ```env
-# Clave de API de OpenAI
 OPENAI_API_KEY="sk-..."
-
-# URL y Clave de Servicio de Supabase
-SUPABASE_URL="https://<tu-id-de-proyecto>.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="tu-clave-de-servicio"
+SUPABASE_URL="https://<tu-id>.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="tu-clave"
 ```
 
-> **Nota:** La `SERVICE_ROLE_KEY` es necesaria para realizar operaciones en el backend, como la generación de embeddings, saltándose las políticas de RLS.
-
-### 6. Generar los Embeddings
-
-El proyecto incluye un script para leer los datos del CV, generar los embeddings y guardarlos en Supabase. Ejecútalo con el siguiente comando:
+### 5. Generar Embeddings
 
 ```bash
 npx tsx scripts/populate-embeddings.ts
 ```
 
-Deberías ver en la consola la confirmación de que los registros han sido creados.
-
-### 7. Ejecutar el Servidor de Desarrollo
+### 6. Ejecutar
 
 ```bash
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador para interactuar con el chatbot.
+Visita [http://localhost:3000](http://localhost:3000) para ver el chatbot con la nueva interfaz.
 
-## Despliegue en Vercel
+## 🎨 Personalización
 
-La forma más sencilla de desplegar este proyecto es usando [Vercel](https://vercel.com/).
+### Cambiar Información Personal
 
-1.  Sube tu repositorio a GitHub.
-2.  Importa el repositorio en Vercel.
-3.  En la configuración del proyecto en Vercel, **añade las mismas variables de entorno** que definiste en tu archivo `.env.local`.
-4.  Vercel se encargará del resto. Una vez finalizado, tendrás una URL pública para tu chatbot.
+Edita `components/welcome-screen.tsx`:
 
-## Uso de la API
+```tsx
+// Línea 164-176
+<h1>Hola, soy <span className="text-blue-400">TU NOMBRE</span></h1>
+<p className="text-lg text-gray-300 mb-2">TU TÍTULO</p>
+<p className="text-gray-400">TU DESCRIPCIÓN PROFESIONAL</p>
+```
 
-Una vez desplegado, puedes integrar el chatbot en cualquier otra aplicación (como tu portafolio) haciendo una petición POST al endpoint `/api/chat`.
+### Preguntas Rápidas
 
-- **URL:** `https://<tu-app>.vercel.app/api/chat`
-- **Método:** `POST`
-- **Body (JSON):**
-  ```json
+Modifica las cards en `components/welcome-screen.tsx` (líneas 119-143):
+
+```tsx
+const quickQuestions = [
   {
+    icon: <TuIcono className="w-5 h-5" />,
+    title: 'Tu Título',
+    description: 'Tu descripción',
+    question: 'Pregunta que se enviará',
+  },
+  // ...
+];
+```
+
+### Ajustar Partículas
+
+```tsx
+// En welcome-screen.tsx, línea 44
+particlesRef.current = Array.from({ length: 25 }, () => ({
+  // Cambia 25 por el número deseado (15-40 recomendado)
+}));
+```
+
+## 📁 Estructura del Proyecto
+
+```
+ChatBot-Rag-Portfolio/
+├── components/
+│   ├── welcome-screen.tsx      # 🎨 Pantalla de bienvenida con partículas
+│   ├── conversation.tsx        # 💬 Componentes de chat
+│   ├── prompt-input.tsx        # 📝 Input de mensajes
+│   └── ...                     # Otros componentes
+├── app/
+│   ├── page.tsx               # 🏠 Página principal con welcome screen
+│   ├── layout.tsx             # 📄 Layout con metadata actualizada
+│   ├── globals.css            # 🎨 Estilos globales
+│   └── api/                   # 🔌 API endpoints
+└── scripts/                   # 🛠️ Scripts de configuración
+```
+
+## 🌟 Características RAG
+
+- **Embeddings Inteligentes:** `text-embedding-3-small` de OpenAI
+- **Búsqueda Semántica:** Similitud de coseno para encontrar información relevante
+- **Base Vectorial:** PostgreSQL con extensión pgvector
+- **Respuestas Contextuales:** Información precisa sobre experiencia y proyectos
+
+## 🚀 Despliegue
+
+### Vercel (Recomendado)
+
+1. Sube a GitHub
+2. Importa en Vercel
+3. Configura variables de entorno
+4. ¡Listo! URL pública disponible
+
+## 💬 API Usage
+
+```bash
+curl -X POST https://tu-app.vercel.app/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{
     "messages": [
-      { "role": "user", "parts": [{ "type": "text", "text": "¿Cuál es tu experiencia con Next.js?" }] }
+      { "role": "user", "parts": [{ "type": "text", "text": "¿Cuáles son tus habilidades?" }] }
     ]
-  }
-  ```
+  }'
+```
+
+## 🔧 Funcionalidades
+
+### ✅ Implementado
+- [x] Pantalla de bienvenida profesional
+- [x] Partículas animadas con Canvas
+- [x] Cards de preguntas rápidas
+- [x] Diseño responsive
+- [x] Integración completa con RAG
+- [x] Metadata SEO optimizada
+
+### 🎯 En Desarrollo
+- [ ] Modo claro/oscuro
+- [ ] Más opciones de personalización
+- [ ] Animaciones de entrada/salida
+- [ ] Estadísticas de uso
+
+## 📞 Contacto
+
+Este chatbot está diseñado para responder preguntas sobre mi experiencia profesional. ¡Pruébalo haciendo clic en las cards de preguntas rápidas o escribiendo tu consulta!
+
+---
+
+**Desarrollado con ❤️ usando React, Next.js, TypeScript e IA**
+
+*Última actualización: Octubre 2025*

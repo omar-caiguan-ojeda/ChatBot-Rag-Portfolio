@@ -35,6 +35,7 @@ import {
   ReasoningTrigger,
 } from '@/components/reasoning';
 import { Loader } from '@/components/loader';
+import { WelcomeScreen } from '@/components/welcome-screen';
 
 const models = [
   // {
@@ -73,12 +74,27 @@ const ChatBotDemo = () => {
     }
   };
 
+  const handleQuickQuestion = (question: string) => {
+    sendMessage(
+      { text: question },
+      {
+        body: {
+          model: model,
+          webSearch: webSearch,
+        },
+      },
+    );
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 relative size-full h-screen">
       <div className="flex flex-col h-full">
         <Conversation className="h-full">
           <ConversationContent>
-            {messages.map((message) => (
+            {messages.length === 0 ? (
+              <WelcomeScreen onQuickQuestion={handleQuickQuestion} />
+            ) : (
+              messages.map((message) => (
               <div key={message.id}>
                 {message.role === 'assistant' && (
                   <Sources>
@@ -128,7 +144,8 @@ const ChatBotDemo = () => {
                   </MessageContent>
                 </Message>
               </div>
-            ))}
+              ))
+            )}
             {status === 'submitted' && <Loader />}
           </ConversationContent>
           <ConversationScrollButton />
